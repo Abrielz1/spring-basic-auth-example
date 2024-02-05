@@ -33,7 +33,7 @@ public class PublicController {
     }
 
     @PostMapping("/account")
-    public ResponseEntity<UserDto> createUserAcolount(@RequestBody UserDto userDto, @RequestParam RoleType type) {
+    public ResponseEntity<UserDto> createUserAccount(@RequestBody UserDto userDto, @RequestParam RoleType type) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createAccount(userDto, type));
     }

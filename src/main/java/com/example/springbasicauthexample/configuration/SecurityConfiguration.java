@@ -13,12 +13,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -28,59 +25,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     @Bean
-    @ConditionalOnProperty(prefix = "app.security", name = "type", havingValue = "inMemory")
-    public PasswordEncoder inMemoryPasswordEncoder(){
-
-        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "app.security", name = "type", havingValue = "db")
+    @ConditionalOnProperty(name = "app.security.type", havingValue = "db")
     public PasswordEncoder passwordEncoder() {
 
         return new  BCryptPasswordEncoder(12);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "app.security", name = "type", havingValue = "inMemory")
-    public UserDetailsService inMemoryUserDetailsService() {
-
-        InMemoryUserDetailsManager memoryUserDetailsManager = new InMemoryUserDetailsManager();
-
-        memoryUserDetailsManager.createUser(User.withUsername("user")
-                .password("user")
-                .roles("USER")
-                .build());
-
-        memoryUserDetailsManager.createUser(User.withUsername("admin")
-                .password("admin")
-                .roles("USER", "ADMIN")
-                .build());
-
-        return memoryUserDetailsManager;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "app.security", name = "type", havingValue = "inMemory")
-    public AuthenticationManager inMemoryAuthenticationManager(HttpSecurity security, UserDetailsService service) {
-
-        var authManagerBuilder = security.getSharedObject(AuthenticationManagerBuilder.class);
-
-        try {
-            authManagerBuilder.userDetailsService(service);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return authManagerBuilder.build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "app.security", name = "type", havingValue = "db")
+    @ConditionalOnProperty(name = "app.security.type", havingValue = "db")
     public AuthenticationManager dbAuthenticationManager(HttpSecurity security,
                                                          UserDetailsService service,
                                                          PasswordEncoder encoder) throws Exception {

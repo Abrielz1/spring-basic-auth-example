@@ -14,4 +14,3 @@ spring:
 app:
   security:
     type: db
-

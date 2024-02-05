@@ -21,7 +21,9 @@ public class UserService {
     public User createNewAccount(User user, Role role) {
 
         user.setRole(Collections.singletonList(role));
-        user.setPassword(user.getPassword());
+        user.setPassword(encoder.encode(user.getPassword()));
+        role.setUser(user);
+
         return repository.save(user);
     }
 
